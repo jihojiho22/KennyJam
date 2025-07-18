@@ -35,5 +35,6 @@ public class SimpleSceneLoader : MonoBehaviour
         
         Debug.Log($"Loading scene: {sceneToLoad}");
         SceneManager.LoadScene(sceneToLoad);
+        //TODO: Add a loading screen
     }
 } 
