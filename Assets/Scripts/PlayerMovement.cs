@@ -44,7 +44,8 @@ public class PlayerMovement : MonoBehaviour
         // Unsubscribe and disable input
         if (leftClickAction != null)
             leftClickAction.performed -= OnLeftClick;
-        playerInput.Disable();
+        if (playerInput != null)
+            playerInput.Disable();
     }
     
     void Start()
