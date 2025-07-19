@@ -77,7 +77,10 @@ public class BuildingSystem : MonoBehaviour, PlayerInput.IPlayerActions
     {
         if (context.performed && isInBuildMode)
         {
-            TryPlaceBuilding();
+            if (!IsMouseOverUI())
+            {
+                TryPlaceBuilding();
+            }
         }
     }
     
@@ -85,13 +88,27 @@ public class BuildingSystem : MonoBehaviour, PlayerInput.IPlayerActions
     {
         if (context.performed)
         {
-            if (!isInBuildMode)
+            if (IsMouseOverUI())
+                return;
+                
+            if (isInBuildMode)
             {
-                EnterBuildMode();
+                ExitBuildMode();
             }
             else
             {
-                ExitBuildMode();
+                BuildingUI buildingUI = FindFirstObjectByType<BuildingUI>();
+                if (buildingUI != null)
+                {
+                    if (buildingUI.IsBuildingPanelVisible())
+                    {
+                        buildingUI.HideBuildingPanel();
+                    }
+                    else
+                    {
+                        buildingUI.ShowBuildingPanel();
+                    }
+                }
             }
         }
     }
@@ -106,12 +123,28 @@ public class BuildingSystem : MonoBehaviour, PlayerInput.IPlayerActions
         OnBuildModeEntered?.Invoke();
     }
     
+    public void StartBuildModeWithPrefab(GameObject prefab)
+    {
+        if (prefab == null) return;
+        
+        isInBuildMode = true;
+        selectedPrefab = prefab;
+        CreatePreview();
+        OnBuildModeEntered?.Invoke();
+    }
+    
     public void ExitBuildMode()
     {
         isInBuildMode = false;
         DestroyPreview();
         selectedPrefab = null;
         OnBuildModeExited?.Invoke();
+        
+        BuildingUI buildingUI = FindFirstObjectByType<BuildingUI>();
+        if (buildingUI != null)
+        {
+            buildingUI.HideBuildingPanel();
+        }
     }
     
     public void CyclePrefab(int direction = 1)
@@ -364,20 +397,6 @@ public class BuildingSystem : MonoBehaviour, PlayerInput.IPlayerActions
     
     void HandleKeyboardInput()
     {
-        for (int i = 0; i < Mathf.Min(9, buildablePrefabs.Length); i++)
-        {
-            Key key = (Key)((int)Key.Digit1 + i);
-            if (Keyboard.current[key].wasPressedThisFrame)
-            {
-                SetCurrentPrefab(i);
-                if (!isInBuildMode)
-                {
-                    EnterBuildMode();
-                }
-                break;
-            }
-        }
-        
         if (Keyboard.current.tabKey.wasPressedThisFrame)
         {
             CyclePrefab();
@@ -421,6 +440,17 @@ public class BuildingSystem : MonoBehaviour, PlayerInput.IPlayerActions
     public Vector3 GetPlacementPosition()
     {
         return placementPosition;
+    }
+    
+    public GameObject[] GetBuildablePrefabs()
+    {
+        return buildablePrefabs;
+    }
+    
+    bool IsMouseOverUI()
+    {
+        return UnityEngine.EventSystems.EventSystem.current != null && 
+               UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
     }
     
     void OnDrawGizmosSelected()

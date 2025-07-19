@@ -20,7 +20,6 @@ public class BuildingUI : MonoBehaviour
     
     void Start()
     {
-        // Find the building system
         buildingSystem = FindFirstObjectByType<BuildingSystem>();
         
         if (buildingSystem == null)
@@ -29,12 +28,10 @@ public class BuildingUI : MonoBehaviour
             return;
         }
         
-        // Subscribe to building system events
         buildingSystem.OnBuildModeEntered += OnBuildModeEntered;
         buildingSystem.OnBuildModeExited += OnBuildModeExited;
         buildingSystem.OnBuildingPlaced += OnBuildingPlaced;
         
-        // Hide panel initially
         if (buildingPanel != null)
             buildingPanel.SetActive(false);
     }
@@ -49,36 +46,6 @@ public class BuildingUI : MonoBehaviour
     
     void UpdateUI()
     {
-        // Update status text
-        if (statusText != null)
-        {
-            if (buildingSystem.CanPlace())
-            {
-                statusText.text = "Ready to Place";
-                statusText.color = validPlacementColor;
-            }
-            else
-            {
-                statusText.text = "Cannot Place Here";
-                statusText.color = invalidPlacementColor;
-            }
-        }
-        
-        // Update current prefab text
-        if (currentPrefabText != null)
-        {
-            GameObject currentPrefab = buildingSystem.GetCurrentPrefab();
-            if (currentPrefab != null)
-            {
-                currentPrefabText.text = $"Current: {currentPrefab.name}";
-            }
-        }
-        
-        // Update status indicator
-        if (statusIndicator != null)
-        {
-            statusIndicator.color = buildingSystem.CanPlace() ? validPlacementColor : invalidPlacementColor;
-        }
     }
     
     void OnBuildModeEntered()
@@ -92,8 +59,7 @@ public class BuildingUI : MonoBehaviour
                                "• Left Click: Place Building\n" +
                                "• Right Click: Exit Build Mode\n" +
                                "• Q/E: Rotate Building\n" +
-                               "• Mouse Wheel: Rotate Building\n" +
-                               "• [1-9]: Select Different Prefab";
+                               "• Mouse Wheel: Rotate Building";
         }
     }
     
@@ -105,11 +71,6 @@ public class BuildingUI : MonoBehaviour
     
     void OnBuildingPlaced(GameObject building, Vector3 position, Quaternion rotation)
     {
-        if (statusText != null)
-        {
-            statusText.text = $"Placed {building.name}!";
-            statusText.color = validPlacementColor;
-        }
     }
     
     void OnDestroy()
@@ -122,7 +83,14 @@ public class BuildingUI : MonoBehaviour
         }
     }
     
-    // Public methods for external UI control
+    public void StartBuildWithPrefab(GameObject prefab)
+    {
+        if (buildingSystem != null && prefab != null)
+        {
+            buildingSystem.StartBuildModeWithPrefab(prefab);
+        }
+    }
+    
     public void ShowBuildingPanel()
     {
         if (buildingPanel != null)
@@ -133,6 +101,11 @@ public class BuildingUI : MonoBehaviour
     {
         if (buildingPanel != null)
             buildingPanel.SetActive(false);
+    }
+    
+    public bool IsBuildingPanelVisible()
+    {
+        return buildingPanel != null && buildingPanel.activeSelf;
     }
     
     public void SetStatusText(string text, Color color)
