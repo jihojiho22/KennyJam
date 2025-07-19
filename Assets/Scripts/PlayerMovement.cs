@@ -22,10 +22,14 @@ public class PlayerMovement : MonoBehaviour
     private Camera playerCamera;
     private PlayerInput playerInput;
     private InputAction leftClickAction;
+    private InputAction rightClickAction;
+    private bool combatSystemActive = false;
+    private PlayerCombat playerCombat;
     
     void Awake()
     {
         playerInput = new PlayerInput();
+        playerCombat = GetComponent<PlayerCombat>();
     }
     
     void OnEnable()
@@ -34,12 +38,17 @@ public class PlayerMovement : MonoBehaviour
         
         leftClickAction = playerInput.Player.LeftClick;
         leftClickAction.performed += OnLeftClick;
+        
+        rightClickAction = playerInput.Player.RightClick;
+        rightClickAction.performed += OnRightClick;
     }
     
     void OnDisable()
     {
         if (leftClickAction != null)
             leftClickAction.performed -= OnLeftClick;
+        if (rightClickAction != null)
+            rightClickAction.performed -= OnRightClick;
         if (playerInput != null)
             playerInput.Disable();
     }
@@ -58,12 +67,54 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         MoveToTarget();
-        animator.SetBool("IsRunning", isMoving);
+        
+        // Control animation based on actual movement
+        bool shouldBeRunning = isMoving || combatSystemActive;
+        animator.SetBool("IsRunning", shouldBeRunning);
     }
     
     void OnLeftClick(InputAction.CallbackContext context)
     {
-        HandleMouseInput();
+        if (context.performed)
+        {
+            // Check if clicking on enemy first
+            GameObject enemy = GetEnemyUnderMouse();
+            if (enemy != null)
+            {
+                // Enemy clicked, let PlayerCombat handle it
+                isMoving = false; // Stop any current movement
+                if (playerCombat != null)
+                {
+                    playerCombat.HandleLeftClick();
+                }
+                return;
+            }
+            
+            // No enemy clicked, handle normal movement
+            // Always handle movement regardless of combat state
+            HandleMouseInput();
+        }
+    }
+    
+    void OnRightClick(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            // Check if clicking on enemy first
+            GameObject enemy = GetEnemyUnderMouse();
+            if (enemy != null)
+            {
+                // Enemy clicked, let PlayerCombat handle it
+                if (playerCombat != null)
+                {
+                    playerCombat.HandleRightClick();
+                }
+                return;
+            }
+            
+            // No enemy clicked, let BuildingSystem handle it
+            // (BuildingSystem will handle right-click for building panel)
+        }
     }
     
     void HandleMouseInput()
@@ -78,6 +129,12 @@ public class PlayerMovement : MonoBehaviour
         
         if (Physics.Raycast(ray, out hit, maxRaycastDistance, groundLayer))
         {
+            // Cancel any combat movement when starting new movement
+            if (playerCombat != null)
+            {
+                playerCombat.CancelCombatMovement();
+            }
+            
             targetPosition = hit.point;
             isMoving = true;
             
@@ -124,6 +181,35 @@ public class PlayerMovement : MonoBehaviour
     {
         return UnityEngine.EventSystems.EventSystem.current != null && 
                UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+    }
+    
+    GameObject GetEnemyUnderMouse()
+    {
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+        RaycastHit hit;
+        
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider.CompareTag("Enemy"))
+            {
+                return hit.collider.gameObject;
+            }
+        }
+        
+        return null;
+    }
+    
+    public void StopMovement()
+    {
+        isMoving = false;
+        Debug.Log("Player movement stopped by combat system");
+    }
+    
+    public void SetCombatMovement(bool isCombatMoving)
+    {
+        combatSystemActive = isCombatMoving;
+        Debug.Log($"Combat movement: {isCombatMoving}");
     }
     
     void OnDrawGizmosSelected()

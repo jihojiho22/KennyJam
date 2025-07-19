@@ -77,37 +77,32 @@ public class BuildingSystem : MonoBehaviour, PlayerInput.IPlayerActions
     {
         if (context.performed && isInBuildMode)
         {
-            if (!IsMouseOverUI())
-            {
-                TryPlaceBuilding();
-            }
+            TryPlaceBuilding();
         }
     }
     
     public void OnRightClick(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && !isInBuildMode)
         {
-            if (IsMouseOverUI())
+            // Check if clicking on enemy first
+            GameObject enemy = GetEnemyUnderMouse();
+            if (enemy != null)
+            {
+                // Enemy clicked, don't open building panel
                 return;
-                
-            if (isInBuildMode)
-            {
-                ExitBuildMode();
             }
-            else
+                
+            BuildingUI buildingUI = FindFirstObjectByType<BuildingUI>();
+            if (buildingUI != null)
             {
-                BuildingUI buildingUI = FindFirstObjectByType<BuildingUI>();
-                if (buildingUI != null)
+                if (buildingUI.IsBuildingPanelVisible())
                 {
-                    if (buildingUI.IsBuildingPanelVisible())
-                    {
-                        buildingUI.HideBuildingPanel();
-                    }
-                    else
-                    {
-                        buildingUI.ShowBuildingPanel();
-                    }
+                    buildingUI.HideBuildingPanel();
+                }
+                else
+                {
+                    buildingUI.ShowBuildingPanel();
                 }
             }
         }
@@ -447,10 +442,23 @@ public class BuildingSystem : MonoBehaviour, PlayerInput.IPlayerActions
         return buildablePrefabs;
     }
     
-    bool IsMouseOverUI()
+
+    
+    GameObject GetEnemyUnderMouse()
     {
-        return UnityEngine.EventSystems.EventSystem.current != null && 
-               UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Ray ray = playerCamera.ScreenPointToRay(mousePosition);
+        RaycastHit hit;
+        
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider.CompareTag("Enemy"))
+            {
+                return hit.collider.gameObject;
+            }
+        }
+        
+        return null;
     }
     
     void OnDrawGizmosSelected()

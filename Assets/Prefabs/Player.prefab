@@ -72,6 +72,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 19b90719afc4848039c0c0708fe69755, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7103254133422559269}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 19b90719afc4848039c0c0708fe69755, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -8598792814531810666}
   m_SourcePrefab: {fileID: 100100000, guid: 19b90719afc4848039c0c0708fe69755, type: 3}
 --- !u!1 &7886001214325454553 stripped
 GameObject:
@@ -177,3 +180,23 @@ MonoBehaviour:
   previewOpacity: 0.6
   validColor: {r: 0, g: 1, b: 0, a: 1}
   invalidColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!114 &-8598792814531810666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7886001214325454553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e681513b27784369bc284c232bf7f0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackRange: 2
+  moveSpeed: 5
+  stoppingDistance: 1
+  animator: {fileID: 3613252458797041726}
+  sliceAnimationName: Slice
+  shootAnimationName: Shoot
+  runAnimationName: isRunning
+  buildingSystem: {fileID: 0}

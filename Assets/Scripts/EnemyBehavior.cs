@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class EnemyBehavior : MonoBehaviour
 {
@@ -18,12 +19,18 @@ public class EnemyBehavior : MonoBehaviour
     [SerializeField] private string runAnimationName = "isRunning";
     [SerializeField] private string attackAnimationName = "isAttacking";
     
+    [Header("Health System")]
+    [SerializeField] private float maxHealth = 100f;
+    [SerializeField] private float currentHealth;
+    [SerializeField] private UnityEngine.UI.Slider healthBar;
+    
     private NavMeshAgent agent;
     private GameObject currentTarget;
     private float lastTargetUpdate;
     private float lastAttackTime;
     private float attackStartTime;
     private bool isAttacking = false;
+    private bool isDead = false;
     
     void Start()
     {
@@ -38,11 +45,23 @@ public class EnemyBehavior : MonoBehaviour
             animator = GetComponent<Animator>();
         }
         
+        // Find HP bar slider if not assigned
+        if (healthBar == null)
+        {
+            FindHealthBar();
+        }
+        
+        // Initialize health
+        currentHealth = maxHealth;
+        UpdateHealthBar();
+        
         FindNewTarget();
     }
     
     void Update()
     {
+        if (isDead) return;
+        
         if (currentTarget == null)
         {
             FindNewTarget();
@@ -87,6 +106,21 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
     
+    void FindHealthBar()
+    {
+        // Look for slider in children (including canvas)
+        Slider[] sliders = GetComponentsInChildren<UnityEngine.UI.Slider>();
+        if (sliders.Length > 0)
+        {
+            healthBar = sliders[0];
+            Debug.Log($"Found HP bar slider: {healthBar.name}");
+        }
+        else
+        {
+            Debug.LogWarning("No slider found in enemy children! Make sure the HP bar slider is a child of this enemy.");
+        }
+    }
+    
     void Attack()
     {
         isAttacking = true;
@@ -114,6 +148,70 @@ public class EnemyBehavior : MonoBehaviour
             animator.SetBool(runAnimationName, !isAttacking && agent.velocity.magnitude > 0.1f);
             animator.SetBool(attackAnimationName, isAttacking);
         }
+    }
+    
+    public void TakeDamage(float damage)
+    {
+        if (isDead) return;
+        
+        Debug.Log($"Enemy TakeDamage called with {damage} damage. Current health before: {currentHealth}");
+        
+        currentHealth -= damage;
+        UpdateHealthBar();
+        
+        Debug.Log($"Enemy took {damage} damage. Health: {currentHealth}/{maxHealth}");
+        
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+    
+    public bool IsDead()
+    {
+        return isDead;
+    }
+    
+    void UpdateHealthBar()
+    {
+        // Try to find health bar if it's null
+        if (healthBar == null)
+        {
+            FindHealthBar();
+        }
+        
+        if (healthBar != null)
+        {
+            // Set the slider's max value to match maxHealth
+            healthBar.maxValue = maxHealth;
+            healthBar.value = currentHealth;
+            Debug.Log($"Health bar updated: {currentHealth}/{maxHealth}");
+        }
+        else
+        {
+            Debug.LogWarning("Health bar is still null! Make sure the enemy has a UI Slider as a child.");
+        }
+    }
+    
+    void Die()
+    {
+        isDead = true;
+        Debug.Log("Enemy died!");
+        
+        // Stop all behavior
+        if (agent != null)
+        {
+            agent.isStopped = true;
+        }
+        
+        // You can add death animation here
+        if (animator != null)
+        {
+            // animator.SetTrigger("Die");
+        }
+        
+        // Destroy the enemy after a delay (or play death animation)
+        Destroy(gameObject, 2f);
     }
     
     void OnDrawGizmosSelected()
