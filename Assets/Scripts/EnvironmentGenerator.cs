@@ -6,23 +6,14 @@ using YamlDotNet.Serialization;
 class LevelData {
     public uint BlockSize { get; set; }
     public uint BlockScale { get; set; }
-    public Point Size { get; set; }
     public Point Player { get; set; }
     public List<List<List<uint>>> Layers { get; set; }
 }
 
 public class EnvironmentGenerator : MonoBehaviour {
+    [SerializeField] private GameObject[] models;
     [SerializeField] private GameObject playerModel;
-    [SerializeField] private GameObject rockModel;
-    [SerializeField] private GameObject treeModel;
     [SerializeField] private TextAsset levelAsset;
-
-    private Dictionary<uint, GameObject> GetModelMap() {
-        return new Dictionary<uint, GameObject>() {
-            { 1, treeModel },
-            { 2, rockModel }
-        };
-    }
 
     private LevelData ParseLevelData() {
         var deserializer = new Deserializer();
@@ -32,22 +23,19 @@ public class EnvironmentGenerator : MonoBehaviour {
     private void CreatePlayer(LevelData levelData) {
         var x = levelData.Player.X * levelData.BlockSize;
         var z = levelData.Player.Y * levelData.BlockSize;
-        playerModel.transform.position = new Vector3(x, 0, z);
+        playerModel.transform.position = new Vector3(x, 3, z);
     }
 
-    private GameObject CreateFloor(LevelData levelData) {
-        var floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
-        var x = levelData.Size.X * levelData.BlockSize / 2;
-        var y = levelData.Size.Y * levelData.BlockSize / 2;
-        floor.transform.position = new Vector3(x, -1, y);
-        floor.transform.localScale = new Vector3(levelData.Size.X, 1, levelData.Size.Y);
-        return floor;
-    }
-
-    private Object CreateEntity(LevelData levelData, Dictionary<uint, GameObject> modelMap, int layer, int x, int y) {
+    private Object CreateEntity(LevelData levelData, int layer, int x, int y) {
+        // 0 means empty space, so we add 1 to the model number
         var modelNumber = levelData.Layers[layer][x][y];
+        
+        if (modelNumber == 0 || modelNumber > models.Length) return null;
+        
+        // Subtract 1 to get the index of the model since 0 represents an empty value
+        modelNumber--;
 
-        if (modelMap.TryGetValue(modelNumber, out var model) == false) return null;
+        var model = models[modelNumber];
 
         var clone = Instantiate(
             model,
@@ -61,8 +49,6 @@ public class EnvironmentGenerator : MonoBehaviour {
     }
 
     private void CreateEnvironment(LevelData levelData) {
-        var modelMap = GetModelMap();
-
         for (var i = 0; i < levelData.Layers.Count; i++) {
             var layer = levelData.Layers[i];
 
@@ -70,7 +56,7 @@ public class EnvironmentGenerator : MonoBehaviour {
                 var row = layer[j];
 
                 for (var k = 0; k < row.Count; k++) {
-                    CreateEntity(levelData, modelMap, i, j, k);
+                    CreateEntity(levelData, i, j, k);
                 }
             }
         }
@@ -78,7 +64,6 @@ public class EnvironmentGenerator : MonoBehaviour {
 
     void Start() {
         var levelData = ParseLevelData();
-        CreateFloor(levelData);
         CreateEnvironment(levelData);
         CreatePlayer(levelData);
     }

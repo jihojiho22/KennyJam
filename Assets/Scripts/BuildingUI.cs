@@ -21,7 +21,7 @@ public class BuildingUI : MonoBehaviour
     void Start()
     {
         // Find the building system
-        buildingSystem = FindObjectOfType<BuildingSystem>();
+        buildingSystem = FindFirstObjectByType<BuildingSystem>();
         
         if (buildingSystem == null)
         {
