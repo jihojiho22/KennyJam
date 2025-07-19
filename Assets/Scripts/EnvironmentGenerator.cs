@@ -1,20 +1,24 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using YamlDotNet.Serialization;
+using Object = UnityEngine.Object;
 
 class LevelData {
     public uint BlockSize { get; set; }
     public uint BlockScale { get; set; }
     public Point Player { get; set; }
-    public List<List<List<uint>>> Layers { get; set; }
+    public List<List<List<int>>> Layers { get; set; }
 }
 
 public class EnvironmentGenerator : MonoBehaviour {
-    [SerializeField] private GameObject[] models;
     [SerializeField] private GameObject playerModel;
     [SerializeField] private TextAsset levelAsset;
+    private List<GameObject> models = new List<GameObject>();
 
     private LevelData ParseLevelData() {
         var deserializer = new Deserializer();
@@ -30,9 +34,9 @@ public class EnvironmentGenerator : MonoBehaviour {
     private Object CreateEntity(LevelData levelData, int layer, int x, int y) {
         // 0 means empty space, so we add 1 to the model number
         var modelNumber = levelData.Layers[layer][x][y];
-        
-        if (modelNumber == 0 || modelNumber > models.Length) return null;
-        
+
+        if (modelNumber == 0 || modelNumber > models.Count) return null;
+
         // Subtract 1 to get the index of the model since 0 represents an empty value
         modelNumber--;
 
@@ -45,13 +49,16 @@ public class EnvironmentGenerator : MonoBehaviour {
         );
 
         clone.transform.localScale = new Vector3(levelData.BlockScale, levelData.BlockScale, levelData.BlockScale);
-        
+
+        var layerName = layer == 0 ? "Ground" : "Scenery";
+        clone.layer = LayerMask.NameToLayer(layerName);
+
         return clone;
     }
 
     private void CreateEnvironment(LevelData levelData) {
         var sceneryGameObject = new GameObject("Scenery");
-        
+
         for (var i = 0; i < levelData.Layers.Count; i++) {
             var layer = levelData.Layers[i];
             var layerGameObject = new GameObject($"Layer {i}") {
@@ -59,25 +66,37 @@ public class EnvironmentGenerator : MonoBehaviour {
                     parent = sceneryGameObject.transform
                 }
             };
-            
+
             var layerName = i == 0 ? "Ground" : "Scenery";
             layerGameObject.layer = LayerMask.NameToLayer(layerName);
 
             for (var j = 0; j < layer.Count; j++) {
                 var row = layer[j];
-                
+
                 for (var k = 0; k < row.Count; k++) {
                     var entity = CreateEntity(levelData, i, j, k);
-                    
+
                     if (entity == null) continue;
-                    
+
                     entity.GameObject().transform.parent = layerGameObject.transform;
                 }
             }
         }
     }
 
+    private void LoadModels() {
+        models.Clear();
+        
+        models = AssetDatabase
+            .FindAssets("l:Scenery")
+            .Select(guid => AssetDatabase.LoadAssetByGUID<GameObject>(new GUID(guid)))
+            .OrderBy(go => go.name)
+            .ToList();
+    }
+
     void Start() {
+        LoadModels();
+
         var levelData = ParseLevelData();
         CreateEnvironment(levelData);
         CreatePlayer(levelData);

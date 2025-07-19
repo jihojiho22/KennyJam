@@ -746,15 +746,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   models:
-  - {fileID: 919132149155446097, guid: 0e4fa2ca988864113b71ba54ff50f369, type: 3}
-  - {fileID: 919132149155446097, guid: 97105de5bee3a4888bd50136cf9c6faf, type: 3}
-  - {fileID: 919132149155446097, guid: 1f4f8263e4364464fad317c0d8da4aa6, type: 3}
-  - {fileID: 919132149155446097, guid: eac1acc10fcaf4066aa860615ff7433e, type: 3}
-  - {fileID: 919132149155446097, guid: be179792ca87847caa0d08229f1ed7e8, type: 3}
-  - {fileID: 919132149155446097, guid: d011f0d51abeb4f6fa4e58d78d67f568, type: 3}
-  - {fileID: 919132149155446097, guid: bcf7745258344484f9fdf59232bb5e1d, type: 3}
-  - {fileID: 919132149155446097, guid: dc77ef7c69bcf4bf1b9e20e30531a434, type: 3}
-  - {fileID: 919132149155446097, guid: 4efe948bbe4f04f56a593ca87a1f9dd9, type: 3}
+  - {fileID: 4194397592995882032, guid: 227ac261a8190445b92d4e83308c0ce7, type: 3}
+  - {fileID: 5334212540829975895, guid: d8e261f7f7afc44a686f244630dbceba, type: 3}
+  - {fileID: 1818007047212309510, guid: e5deb4d03fa434a7c9233cb76fddd0a3, type: 3}
+  - {fileID: 8965669914325218353, guid: 6034c1f34ffcb41d0b8d0605f2c18e8b, type: 3}
+  - {fileID: 2642016547009216675, guid: e326d7de63f824dd28c1cc66f0f8668d, type: 3}
+  - {fileID: 1815453826488656874, guid: 7f6dddc9566454cf5806f2a119351466, type: 3}
+  - {fileID: 265629982448424227, guid: a40f658ee44784bf581f6e343e22fd5f, type: 3}
+  - {fileID: 5432404331585481398, guid: 275f479d41dd84132a1161e5fa1bb4f7, type: 3}
+  - {fileID: 8076743702562164475, guid: 2aa527385a6444588859f5cfb0e5cf25, type: 3}
+  - {fileID: 5439261763729828406, guid: 575bd97f90cbf4bbf934711b038ea7f3, type: 3}
+  - {fileID: 608782519278688280, guid: 4712b2ffa20174106a75f32c8986ddd9, type: 3}
+  - {fileID: 6235615655205093189, guid: 9e29c4cf8dd5740129f72097c32fa0f5, type: 3}
+  - {fileID: 6044847309554589847, guid: a8af022c1998940a8b63680591c8ee61, type: 3}
+  - {fileID: 2934912235518008970, guid: b78e8b8cb3abd4f948b14b9ce094b216, type: 3}
+  - {fileID: 8977510075932772466, guid: 3eb2e347b56c1443494fd391166c0240, type: 3}
+  - {fileID: 6770152863257129681, guid: 8a7b4f17cf65c444fa091592433a1a58, type: 3}
+  - {fileID: 3720734744340230569, guid: edf5c074d5d804b3e86f876aa1c0b3b1, type: 3}
+  - {fileID: 4914033072626188176, guid: 7647457fb868542c7bc4acc9fe3d3e29, type: 3}
+  - {fileID: 3733909201276312805, guid: 7826770b9479d421fafdf7c415cc1cfd, type: 3}
+  - {fileID: 2273085400706231465, guid: 2d222bf397d924486ba73798e4177d5d, type: 3}
+  - {fileID: 3435519818115256907, guid: 9fad127bf051648c591ad4a143017a55, type: 3}
   playerModel: {fileID: 1415556543}
   levelAsset: {fileID: 4900000, guid: d4bddf0437f19480ab875f2275d1deed, type: 3}
 --- !u!4 &1036438909
@@ -1127,6 +1139,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 19b90719afc4848039c0c0708fe69755, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1415556544}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 19b90719afc4848039c0c0708fe69755, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1415556548}
   m_SourcePrefab: {fileID: 100100000, guid: 19b90719afc4848039c0c0708fe69755, type: 3}
 --- !u!1 &1415556543 stripped
 GameObject:
@@ -1202,12 +1217,40 @@ MonoBehaviour:
   stoppingDistance: 0.1
   groundLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 64
   maxRaycastDistance: 100
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 128
   playerRadius: 0.5
+--- !u!114 &1415556548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1415556543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07e844e248b944f709100257b35bf170, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildablePrefabs:
+  - {fileID: 2014462039081775698, guid: 4e4e7c07075f042768cbb9b45688e6b2, type: 3}
+  previewMaterial: {fileID: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  maxRaycastDistance: 100
+  placementOffset: 0
+  minDistanceFromPlayer: 2
+  maxDistanceFromPlayer: 15
+  requireFlatSurface: 0
+  maxSurfaceAngle: 25
+  minDistanceBetweenBuildings: 1
+  previewOpacity: 0.6
+  validColor: {r: 0, g: 1, b: 0, a: 1}
+  invalidColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
