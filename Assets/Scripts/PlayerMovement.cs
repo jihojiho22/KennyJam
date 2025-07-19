@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public Animator animator;
+
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float stoppingDistance = 0.1f;
@@ -53,10 +55,11 @@ public class PlayerMovement : MonoBehaviour
         // Set initial target position to current position
         targetPosition = transform.position;
     }
-    
+
     void Update()
     {
         MoveToTarget();
+        animator.SetBool("IsRunning", isMoving);
     }
     
     void OnClick(InputAction.CallbackContext context)
