@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Drawing;
+using Unity.VisualScripting;
 using UnityEngine;
 using YamlDotNet.Serialization;
 
@@ -43,20 +44,33 @@ public class EnvironmentGenerator : MonoBehaviour {
             model.transform.rotation
         );
 
+        var layerName = layer == 0 ? "Ground" : "Scenery";
+        clone.layer = LayerMask.NameToLayer(layerName);
         clone.transform.localScale = new Vector3(levelData.BlockScale, levelData.BlockScale, levelData.BlockScale);
-
+        
         return clone;
     }
 
     private void CreateEnvironment(LevelData levelData) {
+        var sceneryGameObject = new GameObject("Scenery");
+        
         for (var i = 0; i < levelData.Layers.Count; i++) {
             var layer = levelData.Layers[i];
+            var layerGameObject = new GameObject($"Layer {i}") {
+                transform = {
+                    parent = sceneryGameObject.transform
+                }
+            };
 
             for (var j = 0; j < layer.Count; j++) {
                 var row = layer[j];
-
+                
                 for (var k = 0; k < row.Count; k++) {
-                    CreateEntity(levelData, i, j, k);
+                    var entity = CreateEntity(levelData, i, j, k);
+                    
+                    if (entity == null) continue;
+                    
+                    entity.GameObject().transform.parent = layerGameObject.transform;
                 }
             }
         }
