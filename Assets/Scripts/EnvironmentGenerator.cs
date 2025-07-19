@@ -44,8 +44,6 @@ public class EnvironmentGenerator : MonoBehaviour {
             model.transform.rotation
         );
 
-        var layerName = layer == 0 ? "Ground" : "Scenery";
-        clone.layer = LayerMask.NameToLayer(layerName);
         clone.transform.localScale = new Vector3(levelData.BlockScale, levelData.BlockScale, levelData.BlockScale);
         
         return clone;
@@ -61,6 +59,9 @@ public class EnvironmentGenerator : MonoBehaviour {
                     parent = sceneryGameObject.transform
                 }
             };
+            
+            var layerName = i == 0 ? "Ground" : "Scenery";
+            layerGameObject.layer = LayerMask.NameToLayer(layerName);
 
             for (var j = 0; j < layer.Count; j++) {
                 var row = layer[j];
