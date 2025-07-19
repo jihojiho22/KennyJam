@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -6,7 +5,6 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using YamlDotNet.Serialization;
-using Object = UnityEngine.Object;
 
 class LevelData {
     public uint BlockSize { get; set; }
@@ -18,20 +16,29 @@ class LevelData {
 public class EnvironmentGenerator : MonoBehaviour {
     [SerializeField] private GameObject playerModel;
     [SerializeField] private TextAsset levelAsset;
-    private List<GameObject> models = new List<GameObject>();
+    private List<GameObject> models = new();
 
     private LevelData ParseLevelData() {
         var deserializer = new Deserializer();
         return deserializer.Deserialize<LevelData>(levelAsset.text);
     }
 
-    private void CreatePlayer(LevelData levelData) {
+    private GameObject CreatePlayer(LevelData levelData) {
         var x = levelData.Player.X * levelData.BlockSize;
         var z = levelData.Player.Y * levelData.BlockSize;
-        playerModel.transform.position = new Vector3(x, 3, z);
+        
+        var player = Instantiate(
+            playerModel,
+            new Vector3(x, 3, z),
+            playerModel.transform.rotation
+        );
+        
+        player.tag = "Player";
+
+        return player;
     }
 
-    private Object CreateEntity(LevelData levelData, int layer, int x, int y) {
+    private GameObject CreateEntity(LevelData levelData, int layer, int x, int y) {
         // 0 means empty space, so we add 1 to the model number
         var modelNumber = levelData.Layers[layer][x][y];
 
@@ -53,7 +60,7 @@ public class EnvironmentGenerator : MonoBehaviour {
         var layerName = layer == 0 ? "Ground" : "Scenery";
         clone.layer = LayerMask.NameToLayer(layerName);
 
-        return clone;
+        return clone.GameObject();
     }
 
     private void CreateEnvironment(LevelData levelData) {
@@ -78,7 +85,7 @@ public class EnvironmentGenerator : MonoBehaviour {
 
                     if (entity == null) continue;
 
-                    entity.GameObject().transform.parent = layerGameObject.transform;
+                    entity.transform.parent = layerGameObject.transform;
                 }
             }
         }
@@ -88,8 +95,8 @@ public class EnvironmentGenerator : MonoBehaviour {
         models.Clear();
         
         models = AssetDatabase
-            .FindAssets("l:Scenery")
-            .Select(guid => AssetDatabase.LoadAssetByGUID<GameObject>(new GUID(guid)))
+            .FindAssetGUIDs("l:Scenery")
+            .Select(AssetDatabase.LoadAssetByGUID<GameObject>)
             .OrderBy(go => go.name)
             .ToList();
     }
@@ -100,8 +107,5 @@ public class EnvironmentGenerator : MonoBehaviour {
         var levelData = ParseLevelData();
         CreateEnvironment(levelData);
         CreatePlayer(levelData);
-    }
-
-    void Update() {
     }
 }

@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 84e8273fe817e41f3a31560007031c65, type: 3}
       propertyPath: m_Name
-      value: tile-spawn
+      value: 006 tile-spawn
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 84e8273fe817e41f3a31560007031c65, type: 3}
       propertyPath: m_Layer
@@ -67,6 +67,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 84e8273fe817e41f3a31560007031c65, type: 3}
       insertIndex: -1
       addedObject: {fileID: -5063439776076567960}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 84e8273fe817e41f3a31560007031c65, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -6029038572608774631}
   m_SourcePrefab: {fileID: 100100000, guid: 84e8273fe817e41f3a31560007031c65, type: 3}
 --- !u!1 &2553392239058965630 stripped
 GameObject:
@@ -95,3 +98,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 921141965265942323, guid: 84e8273fe817e41f3a31560007031c65, type: 3}
+--- !u!114 &-6029038572608774631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2553392239058965630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3008509fdf8441aac865ebca18bbceb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minimumSpawnTime: 5
+  maximumSpawnTime: 15
+  enemyLabels:
+  - Enemy:Skeleton
