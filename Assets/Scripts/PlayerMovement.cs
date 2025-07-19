@@ -13,11 +13,15 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask groundLayer = 1;
     [SerializeField] private float maxRaycastDistance = 100f;
     
+    [Header("Collision Detection")]
+    [SerializeField] private LayerMask obstacleLayer = 1;
+    [SerializeField] private float playerRadius = 0.5f;
+    
     private Vector3 targetPosition;
     private bool isMoving = false;
     private Camera playerCamera;
     private PlayerInput playerInput;
-    private InputAction clickAction;
+    private InputAction leftClickAction;
     
     void Awake()
     {
@@ -30,16 +34,16 @@ public class PlayerMovement : MonoBehaviour
         // Enable the input action map
         playerInput.Enable();
         
-        // Subscribe to the click action
-        clickAction = playerInput.Player.Click;
-        clickAction.performed += OnClick;
+        // Subscribe to the left click action
+        leftClickAction = playerInput.Player.LeftClick;
+        leftClickAction.performed += OnLeftClick;
     }
     
     void OnDisable()
     {
         // Unsubscribe and disable input
-        if (clickAction != null)
-            clickAction.performed -= OnClick;
+        if (leftClickAction != null)
+            leftClickAction.performed -= OnLeftClick;
         playerInput.Disable();
     }
     
@@ -62,7 +66,7 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("IsRunning", isMoving);
     }
     
-    void OnClick(InputAction.CallbackContext context)
+    void OnLeftClick(InputAction.CallbackContext context)
     {
         HandleMouseInput();
     }
@@ -104,8 +108,25 @@ public class PlayerMovement : MonoBehaviour
         // Calculate direction to target
         Vector3 direction = (targetPosition - transform.position).normalized;
         
-        // Move towards target
-        transform.position += direction * moveSpeed * Time.deltaTime;
+        // Calculate movement distance for this frame
+        float moveDistance = moveSpeed * Time.deltaTime;
+        
+        // Check for collisions before moving
+        Vector3 newPosition = transform.position + direction * moveDistance;
+        
+        // Use Physics.SphereCast to check for obstacles
+        RaycastHit hit;
+        
+        if (Physics.SphereCast(transform.position, playerRadius, direction, out hit, moveDistance, obstacleLayer))
+        {
+            // There's an obstacle in the way
+            Debug.Log($"Obstacle detected: {hit.collider.name}");
+            isMoving = false;
+            return;
+        }
+        
+        // No obstacles, safe to move
+        transform.position = newPosition;
         
         // Optional: Rotate player to face movement direction
         if (direction != Vector3.zero)
