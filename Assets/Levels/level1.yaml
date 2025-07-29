@@ -1,5 +1,5 @@
-BlockSize: 11
-BlockScale: 11
+BlockSize: 10
+BlockScale: 10
 Player:
     X: 7
     Y: 4
